@@ -1,6 +1,5 @@
 name: Simple Python CI
 
-# Trigger this workflow on every push and pull request to the main branch
 on:
   push:
     branches:
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code from the repository
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -24,13 +23,13 @@ jobs:
         with:
           python-version: '3.8'
 
-      # Step 3: Install Python dependencies globally
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip  # Upgrade pip
           pip install -r requirements.txt  # Install dependencies
 
-      # Step 4: Run the tests
+      # Step 4: Run tests
       - name: Run tests
         run: |
-          python -m unittest discover -s test -p "*.py"  # Discover and run all tests in the "test" folder
+          python -m unittest discover -s test  # Discover and run all tests in the "test" folder
