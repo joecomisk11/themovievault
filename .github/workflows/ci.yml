@@ -32,4 +32,4 @@ jobs:
       # Step 4: Run tests
       - name: Run tests
         run: |
-          pytest /test/  # Explicitly point to the "test" directory
+          pytest
