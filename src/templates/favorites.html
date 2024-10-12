@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <button onclick="history.back()" class="back-button">Back</button>
+    </div>
+
+    <!-- Favorites Section -->
+    <div class="favorites-container">
+        {% if favorites %}
+            {% for favorite in favorites %}
+            <div class="movie-card">
+                <!-- Movie Card Link -->
+                <a href="{{ url_for('movie_details', title=favorite.movie_title) }}" class="movie-link">
+                    <div class="movie-poster">
+                        <img src="https://image.tmdb.org/t/p/w500{{ favorite.movie_poster }}" alt="Poster for {{ favorite.movie_title }}">
+                    </div>
+                    <div class="movie-details">
+                        <h2>{{ favorite.movie_title }}</h2>
+                        <p><strong>Release Date:</strong> {{ favorite.movie_release_date or 'N/A' }}</p>
+                        <p><strong>Rating:</strong> {{ favorite.movie_rating or 'N/A' }} / 10</p>
+                        <p><strong>Runtime:</strong> {{ favorite.movie_runtime or 'N/A' }} minutes</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No favorite movies found.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,5 +1,3 @@
-import os
-
 import requests
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_user, login_required, \
@@ -7,7 +5,7 @@ from flask_login import LoginManager, login_user, login_required, \
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Favorite
 
-app = Flask(__name__, template_folder=os.path.abspath('../templates'))
+app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bgfbrbg843thu34iingubdf'
 OMDB_API_KEY = ' b54b0bbd'
@@ -235,12 +233,14 @@ def fetch_movie_by_id(movie_id):
     Fetches movie details from TMDb API based on the movie ID.
     """
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        return response.json()  # Return the movie data
-    else:
-        return None  # Return None if the movie is not found
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None  # Return None if the movie is not found (e.g., 404)
+    except requests.exceptions.RequestException:
+        return None   # Return None if the movie is not found
 
 
 def fetch_top_rated_movies():

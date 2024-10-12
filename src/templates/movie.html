@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <button onclick="history.back()" class="back-button">Back</button>
+    </div>
+
+    <div class="movie-details-container">
+        <!-- Poster and Movie Information Section -->
+        <div class="movie-poster">
+            {% if movie.poster_path %}
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+            {% else %}
+            <p>No poster available</p>
+            {% endif %}
+        </div>
+
+        <div class="movie-info">
+            <h1>{{ movie.title }}</h1>
+
+            <p><strong>Release Date:</strong> {{ movie.release_date or 'N/A' }}</p>
+
+            <p><strong>Genres:</strong> 
+                {% for genre in movie.genres %}
+                    {{ genre.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+
+            <p><strong>Rating:</strong> {{ movie.vote_average or 'N/A' }} / 10</p>
+
+            <p><strong>Runtime:</strong> {{ movie.runtime or 'N/A' }} minutes</p>
+
+            <!-- Conditional Favorites Button -->
+            {% if current_user.is_authenticated %}
+                {% if is_favorite %}
+                <!-- Show Remove from Favorites button -->
+                <form action="{{ url_for('remove_from_favorites', movie_id=movie.id) }}" method="POST">
+                    <button type="submit" class="favorites-button">
+                        <i class="fa fa-heart"></i> Remove from Favorites
+                    </button>
+                </form>
+                {% else %}
+                <!-- Show Add to Favorites button -->
+                <form action="{{ url_for('add_to_favorites', movie_id=movie.id) }}" method="POST">
+                    <button type="submit" class="favorites-button">
+                        <i class="fa fa-heart"></i> Add to Favorites
+                    </button>
+                </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="movie-overview">
+        <h2>Overview</h2>
+        <p>{{ movie.overview }}</p>
+    </div>
+
+    <!-- Cast Section (Optional) -->
+    {% if cast %}
+    <div class="movie-cast">
+        <h2>Cast</h2>
+        <ul>
+            {% for actor in cast %}
+            <li>{{ actor.name }} as {{ actor.character }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+{% endblock %}

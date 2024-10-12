@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Search Bar Section -->
+    <div class="search-bar-container">
+        <form action="{{ url_for('search_movies') }}" method="GET">
+            <input type="text" name="query" placeholder="Search for movies..." required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- View Favorite Movies Button Section (Centered) -->
+    {% if current_user.is_authenticated %}
+    <div class="favorites-button-section">
+        <a href="{{ url_for('view_favorites') }}" class="favorites-button">View Favorite Movies</a>
+    </div>
+    {% endif %}
+
+    <!-- New Movies Section -->
+    <div class="movie-row">
+        <h2>New Movies</h2>
+        <div class="movie-container">
+            {% for movie in new_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top Rated Movies Section -->
+    <div class="movie-row">
+        <h2>Top Rated Movies</h2>
+        <div class="movie-container">
+            {% for movie in top_rated_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Genre: Action Movies Section -->
+    <div class="movie-row">
+        <h2>Action Movies</h2>
+        <div class="movie-container">
+            {% for movie in action_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Genre: Comedy Movies Section -->
+    <div class="movie-row">
+        <h2>Comedy Movies</h2>
+        <div class="movie-container">
+            {% for movie in comedy_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Genre: Horror Movies Section -->
+    <div class="movie-row">
+        <h2>Horror Movies</h2>
+        <div class="movie-container">
+            {% for movie in horror_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Genre: Romance Movies Section -->
+    <div class="movie-row">
+        <h2>Romance Movies</h2>
+        <div class="movie-container">
+            {% for movie in romance_movies %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
