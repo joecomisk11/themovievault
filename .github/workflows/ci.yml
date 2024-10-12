@@ -13,22 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Python
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: '3.8'
 
+      # Step 3: Install dependencies (without virtual environment)
       - name: Install dependencies
         run: |
-          python -m venv venv             
-          source venv/bin/activate          
-          pip install --upgrade pip       
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip      # Upgrade pip to the latest version
+          pip install -r requirements.txt          # Install the dependencies globally
 
+      # Step 4: Run unit tests
       - name: Run unit tests
         run: |
-          source venv/bin/activate
-          python -m unittest discover -s test # Run your tests
+          python -m unittest discover -s test      # Run unit tests
