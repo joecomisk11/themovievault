@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -26,11 +26,10 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install --upgrade pip  # Upgrade pip
+          pip install -r requirements.txt  # Install dependencies
 
       # Step 4: Run tests
       - name: Run tests
         run: |
-          pytest test/  # Explicitly point to the "test" directory
+          pytest movievault/test/  # Explicitly point to the "movievault/test" directory
