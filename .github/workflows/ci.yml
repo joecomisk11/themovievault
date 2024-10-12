@@ -32,4 +32,4 @@ jobs:
       # Step 4: Run tests
       - name: Run tests
         run: |
-          pytest movievault/test/  # Explicitly point to the "movievault/test" directory
+          pytest /test/  # Explicitly point to the "test" directory
