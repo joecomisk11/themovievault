@@ -1,5 +1,6 @@
 import requests
 from flask import Flask, render_template, redirect, url_for, request, flash
+from sqlalchemy.exc import OperationalError
 from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -22,7 +23,10 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+    except OperationalError:
+        print("Tables already exist. Skipping creation.")
 
 
 @login_manager.user_loader
