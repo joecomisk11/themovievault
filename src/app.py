@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Flask, render_template, redirect, url_for, request, flash
 from sqlalchemy.exc import OperationalError
@@ -14,7 +15,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'bgfbrbg843thu34iingubdf'
 OMDB_API_KEY = ' b54b0bbd'
 TMDB_API_KEY = '056f3d31df0856f08c488274990e7921'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+if 'DATABASE_URL' in os.environ:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']  # Heroku PostgreSQL
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Local SQLite
 
 db.init_app(app)
 
@@ -39,20 +44,18 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
-        print(f"Attempting login for user: {username}")
-        
+
         user = User.query.filter_by(username=username).first()
+
         if not user:
             flash('Invalid username or password')
-            print("User not found")
+
         elif check_password_hash(user.password, password):
             login_user(user)
-            print(f"User {username} logged in successfully.")
             return redirect(url_for('dashboard'))
+
         else:
             flash('Invalid username or password')
-            print("Invalid password")
 
     return render_template('login.html', hide_login=True)
 
