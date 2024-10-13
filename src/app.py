@@ -18,6 +18,8 @@ OMDB_API_KEY = ' b54b0bbd'
 TMDB_API_KEY = '056f3d31df0856f08c488274990e7921'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')
+if app.config['SQLALCHEMY_DATABASE_URI'] and app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
 
 db.init_app(app)
 migrate = Migrate(app, db)
