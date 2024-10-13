@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from sqlalchemy.exc import OperationalError
 from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 try:
     from models import db, User, Favorite  # Local import
@@ -16,12 +17,10 @@ app.config['SECRET_KEY'] = 'bgfbrbg843thu34iingubdf'
 OMDB_API_KEY = ' b54b0bbd'
 TMDB_API_KEY = '056f3d31df0856f08c488274990e7921'
 
-if 'DATABASE_URL' in os.environ:
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']  # Heroku PostgreSQL
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Local SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
