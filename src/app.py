@@ -276,7 +276,7 @@ def view_favorites():
 @login_required
 def recommendations():
     genre_recommendations, actor_recommendations = fetch_recommendations()
-    return render_template('recommendations.html', 
+    return render_template('recommendations.html',
                            genre_recommendations=genre_recommendations, 
                            actor_recommendations=actor_recommendations)
 
@@ -323,9 +323,27 @@ def fetch_movies_by_genre(genre_name):
 
 
 def fetch_movies_by_search(query):
-    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
-    response = requests.get(url)
-    return response.json().get('results', [])
+    # Search for movies by title
+    movie_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
+    movie_response = requests.get(movie_url)
+    movie_results = movie_response.json().get('results', [])
+
+    # Search for actors by name
+    actor_url = f"https://api.themoviedb.org/3/search/person?api_key={TMDB_API_KEY}&query={query}"
+    actor_response = requests.get(actor_url)
+    actor_results = actor_response.json().get('results', [])
+
+    # Collect movie results based on actor search
+    actor_movie_results = []
+    for actor in actor_results:
+        for movie in actor.get('known_for', []):
+            if movie not in actor_movie_results:
+                actor_movie_results.append(movie)
+
+    # Combine both movie title search results and actor-related movies
+    combined_results = movie_results + actor_movie_results
+
+    return combined_results
 
 
 def get_user_favorites():

@@ -21,7 +21,7 @@
                 <img src="https://image.tmdb.org/t/p/w200{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
             </div>
             <div class="details">
-                <h2><a href="{{ url_for('movie_details', title=movie.title) }}">{{ movie.title }} ({{ movie.release_date[:4] }})</a></h2>
+                <h2><a href="{{ url_for('movie_details', title=movie.title) }}">{{ movie.title }} ({{ movie.release_date[:4] if movie.release_date else 'Unknown' }})</a></h2>
                 <p><strong>Rating:</strong> {{ movie.vote_average }} / 10</p>
                 <p><strong>Overview:</strong> {{ movie.overview[:200] }}...</p>
             </div>
