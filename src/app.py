@@ -6,12 +6,23 @@ from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 try:
     from models import db, User, Favorite  # Local import
 except ModuleNotFoundError:
     from src.models import db, User, Favorite  # Heroku import
 
 app = Flask(__name__)
+
+sentry_sdk.init(
+    dsn="https://a6dac84ec65d0d4edc43a70edf1674c4@o4508120998936576.ingest.us.sentry.io/4508121009815552",
+    integrations=[FlaskIntegration(), SqlalchemyIntegration()],
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0
+)
+
 
 app.config['SECRET_KEY'] = 'bgfbrbg843thu34iingubdf'
 OMDB_API_KEY = ' b54b0bbd'
