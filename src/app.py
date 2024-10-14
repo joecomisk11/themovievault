@@ -328,6 +328,9 @@ def fetch_movies_by_search(query):
     movie_response = requests.get(movie_url)
     movie_results = movie_response.json().get('results', [])
 
+    # Filter out movies that don't have a poster
+    movie_results = [movie for movie in movie_results if movie.get('poster_path')]
+
     # Search for actors by name
     actor_url = f"https://api.themoviedb.org/3/search/person?api_key={TMDB_API_KEY}&query={query}"
     actor_response = requests.get(actor_url)
@@ -337,7 +340,8 @@ def fetch_movies_by_search(query):
     actor_movie_results = []
     for actor in actor_results:
         for movie in actor.get('known_for', []):
-            if movie not in actor_movie_results:
+            # Only add movies with a valid title, id, and poster
+            if movie.get('title') and movie.get('id') and movie.get('poster_path'):
                 actor_movie_results.append(movie)
 
     # Combine both movie title search results and actor-related movies
