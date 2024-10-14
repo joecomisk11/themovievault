@@ -105,6 +105,33 @@ def logout():
     return redirect(url_for('dashboard'))
 
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if request.method == 'POST':
+        # Get updated information from the form
+        current_user.first_name = request.form.get('first_name')
+        current_user.last_name = request.form.get('last_name')
+        new_password = request.form.get('password')
+        
+        # Check if the user wants to change their password
+        if new_password:
+            hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+            current_user.password = hashed_password
+        
+        # Commit changes to the database
+        try:
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        except OperationalError:
+            db.session.rollback()
+            flash('Error updating profile. Please try again.', 'danger')
+
+    # Render the edit profile page
+    return render_template('edit_profile.html')
+
+
 def fetch_popular_movies_tmdb():
     url = f"https://api.themoviedb.org/3/movie/popular?api_key={TMDB_API_KEY}&language=en-US&page=1"
     response = requests.get(url)

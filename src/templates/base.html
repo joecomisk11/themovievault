@@ -38,6 +38,9 @@
         .sign-in-container {
             position: absolute;
             right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Add some space between buttons */
         }
         /* Search Results Container */
         .search-results-container {
@@ -160,6 +163,79 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border-radius: 8px;
         }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .auth-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .auth-card .form-group {
+            margin-bottom: 15px;
+        }
+
+        .auth-card .form-group label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .auth-card .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .auth-card button.action-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .auth-card button.action-button:hover {
+            background-color: #1666c1;
+        }
+
+        .auth-card p {
+            text-align: center;
+            margin-top: 15px;
+            color: #555;
+        }
+
+        .auth-card p a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .auth-card p a:hover {
+            color: #1666c1;
+        }
+
 
         .movie-row h2 {
             font-size: 1.5rem;
@@ -420,6 +496,10 @@
         </h1>
         <div class="sign-in-container">
             {% if current_user.is_authenticated %}
+                <!-- Show Edit Profile Button -->
+                <a href="{{ url_for('edit_profile') }}">
+                    <button class="action-button">Edit Profile</button>
+                </a>
                 <!-- Show Logout Button -->
                 <form action="{{ url_for('logout') }}" method="POST">
                     <button class="action-button">Logout</button>
