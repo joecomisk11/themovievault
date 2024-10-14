@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <button onclick="history.back()" class="back-button">Back</button>
+    </div>
+    <h2>Recommended Movies</h2>
+
+    <!-- Recommended Movies by Genre Section -->
+    <h3>Movies Recommended by Genre</h3>
+    {% if genre_recommendations %}
+        <div class="movie-container">
+            {% for movie in genre_recommendations %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No recommendations by genre available. Favorite some movies to get recommendations!</p>
+    {% endif %}
+
+    <!-- Recommended Movies by Actor Section -->
+    <h3>Movies Recommended by Actor</h3>
+    {% if actor_recommendations %}
+        <div class="movie-container">
+            {% for movie in actor_recommendations %}
+            <div class="movie-card">
+                <a href="{{ url_for('movie_details', title=movie.title) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="Poster for {{ movie.title }}">
+                    <h2>{{ movie.title }} ({{ movie.release_date[:4] }})</h2>
+                </a>
+                <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No recommendations by actor available. Favorite some movies to get recommendations!</p>
+    {% endif %}
+
+{% endblock %}

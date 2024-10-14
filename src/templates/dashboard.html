@@ -9,10 +9,11 @@
         </form>
     </div>
 
-    <!-- View Favorite Movies Button Section (Centered) -->
+    <!-- View Favorite and Recommended Movies Button Section (Side-by-Side) -->
     {% if current_user.is_authenticated %}
-    <div class="favorites-button-section">
+    <div class="button-container">
         <a href="{{ url_for('view_favorites') }}" class="favorites-button">View Favorite Movies</a>
+        <a href="{{ url_for('recommendations') }}" class="recommended-button">View Recommended Movies</a>
     </div>
     {% endif %}
 

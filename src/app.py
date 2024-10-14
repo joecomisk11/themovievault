@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+from collections import Counter
 try:
     from models import db, User, Favorite  # Local import
 except ModuleNotFoundError:
@@ -271,6 +272,15 @@ def view_favorites():
     return render_template('favorites.html', favorites=favorites)
 
 
+@app.route('/recommendations')
+@login_required
+def recommendations():
+    genre_recommendations, actor_recommendations = fetch_recommendations()
+    return render_template('recommendations.html', 
+                           genre_recommendations=genre_recommendations, 
+                           actor_recommendations=actor_recommendations)
+
+
 def fetch_new_movies():
     url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={TMDB_API_KEY}&language=en-US&page=1"
     response = requests.get(url)
@@ -281,11 +291,12 @@ def fetch_movie_by_id(movie_id):
     """
     Fetches movie details from TMDb API based on the movie ID.
     """
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&append_to_response=credits"
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            return response.json()
+            movie_details = response.json()
+            return movie_details
         else:
             return None  # Return None if the movie is not found (e.g., 404)
     except requests.exceptions.RequestException:
@@ -315,6 +326,102 @@ def fetch_movies_by_search(query):
     url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
     response = requests.get(url)
     return response.json().get('results', [])
+
+
+def get_user_favorites():
+    """Fetch the current user's favorite movies and extract genres and actors."""
+    favorite_movies = Favorite.query.filter_by(user_id=current_user.id).all()
+
+    if not favorite_movies:
+        return None, None
+
+    genres = []
+    actors = []
+
+    for favorite in favorite_movies:
+        # Fetch movie details by movie ID from the TMDb API
+        movie_details = fetch_movie_by_id(favorite.movie_id)
+
+        # Add genres from the movie details to the list
+        if 'genres' in movie_details:
+            genres.extend([genre['name'] for genre in movie_details['genres']])
+
+        # Add top 3 actors from the movie to the list
+        if 'credits' in movie_details:
+            actors.extend([actor['name'] for actor in movie_details['credits']['cast'][:3]])
+
+    print(f"Collected genres: {genres}")  # Add this line to print collected genres
+    return genres, actors
+
+
+
+def fetch_recommendations():
+    """Fetch recommended movies based on user's favorite genres or actors."""
+    genres, actors = get_user_favorites()
+    print(f"Genres: {genres}")  # Check if genres are correctly collected
+    print(f"Actors: {actors}")
+
+    genre_recommendations = []
+    actor_recommendations = []
+
+    if genres:
+        # Get the most common genre
+        common_genre = Counter(genres).most_common(1)[0][0]
+        print(f"Most common genre: {common_genre}")  # Print the most common genre
+        genre_recommendations.extend(fetch_movies_by_genre(common_genre))
+
+    if actors:
+        # Get the most common actor
+        common_actor = Counter(actors).most_common(1)[0][0]
+        print(f"Most common actor: {common_actor}")  # Print the most common actor
+        actor_recommendations.extend(fetch_movies_by_actor(common_actor))
+
+    # Remove duplicate recommendations
+    unique_genre_recommendations = {movie['id']: movie for movie in genre_recommendations}.values()
+    unique_actor_recommendations = {movie['id']: movie for movie in actor_recommendations}.values()
+
+    return list(unique_genre_recommendations), list(unique_actor_recommendations)
+
+
+def fetch_movies_by_actor(actor_name):
+    """Fetch movies from TMDb API based on actor."""
+    url = f"https://api.themoviedb.org/3/search/person?api_key={TMDB_API_KEY}&query={actor_name}"
+    response = requests.get(url)
+    actor_data = response.json()
+
+    if actor_data['results']:
+        actor_id = actor_data['results'][0]['id']
+        # Fetch movies featuring the actor by their ID
+        url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_cast={actor_id}"
+        response = requests.get(url)
+        return response.json().get('results', [])
+
+    return []
+
+def fetch_movies_by_genre(genre_name):
+    """Fetch movies from TMDb API based on genre."""
+    genre_map = {
+        'Action': 28,
+        'Comedy': 35,
+        'Horror': 27,
+        'Romance': 10749,
+        'Science Fiction': 878,  # Added Science Fiction
+        'Thriller': 53,          # Added Thriller
+        'Drama': 18,             # Added Drama
+        'Adventure': 12          # Added Adventure
+    }
+    genre_id = genre_map.get(genre_name)
+    if genre_id:
+        url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&language=en-US&page=1"
+        response = requests.get(url)
+        print(f"Fetching movies for genre: {genre_name}")  # Debugging print statement
+        print(f"API response: {response.json()}")  # Print the API response for debugging
+        return response.json().get('results', [])
+    else:
+        print(f"Genre {genre_name} not found in genre_map.")
+        return []
+
+
 
 
 if __name__ == "__main__":
