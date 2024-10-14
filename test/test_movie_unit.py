@@ -48,11 +48,19 @@ class TestFetchMoviesByGenre(unittest.TestCase):
     @patch('requests.get')
     def test_valid_query(self, mock_get):
         mock_response = MagicMock()
-        mock_response.json.return_value = {'results': [{'title': 'Movie 1'}]}
+        # Add 'poster_path' to the result
+        mock_response.json.return_value = {
+            'results': [{'title': 'Movie 1', 'poster_path': '/path/to/poster1.jpg'}]
+        }
         mock_get.return_value = mock_response
+
         query = 'valid query'
         results = fetch_movies_by_search(query)
-        self.assertEqual(results, [{'title': 'Movie 1'}])
+
+        # Expected result should only include movies with a poster
+        expected_results = [{'title': 'Movie 1', 'poster_path': '/path/to/poster1.jpg'}]
+        self.assertEqual(results, expected_results)
+
 
     @patch('requests.get')
     def test_empty_query(self, mock_get):
@@ -75,12 +83,24 @@ class TestFetchMoviesByGenre(unittest.TestCase):
     @patch('requests.get')
     def test_multiple_results(self, mock_get):
         mock_response = MagicMock()
-        mock_response.json.return_value = {'results': [{'title': 'Movie 1'},
-                                                       {'title': 'Movie 2'}]}
+        # Add 'poster_path' to each result
+        mock_response.json.return_value = {
+            'results': [
+                {'title': 'Movie 1', 'poster_path': '/path/to/poster1.jpg'},
+                {'title': 'Movie 2', 'poster_path': '/path/to/poster2.jpg'}
+            ]
+        }
         mock_get.return_value = mock_response
+
         query = 'multiple results'
         results = fetch_movies_by_search(query)
-        self.assertEqual(results, [{'title': 'Movie 1'}, {'title': 'Movie 2'}])
+
+        # Expected result should only include movies with a poster
+        expected_results = [
+            {'title': 'Movie 1', 'poster_path': '/path/to/poster1.jpg'},
+            {'title': 'Movie 2', 'poster_path': '/path/to/poster2.jpg'}
+        ]
+        self.assertEqual(results, expected_results)
 
     @patch('requests.get')
     def test_request_exception(self, mock_get):
