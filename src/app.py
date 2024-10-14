@@ -7,6 +7,7 @@ from flask_login import LoginManager, login_user, login_required, \
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 import sentry_sdk
+import redis
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from collections import Counter
@@ -23,6 +24,9 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0
 )
+
+# Redis client initialization
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 
 app.config['SECRET_KEY'] = 'bgfbrbg843thu34iingubdf'
@@ -230,7 +234,6 @@ def search_movies():
 @app.route('/add_to_favorites/<int:movie_id>', methods=['POST'])
 @login_required
 def add_to_favorites(movie_id):
-    # Fetch movie details by movie_id
     movie = fetch_movie_by_id(movie_id)
 
     if movie:
@@ -246,6 +249,15 @@ def add_to_favorites(movie_id):
 
         db.session.add(favorite)
         db.session.commit()
+
+        # Publish event to Redis channel
+        event_data = {
+            'user_id': current_user.id,
+            'movie_id': movie['id'],
+            'movie_title': movie['title']
+        }
+        redis_client.publish('favorites_channel', str(event_data))  # Event message sent to Redis Pub/Sub
+
         flash(f"{movie['title']} has been added to your favorites!", "success")
 
     return redirect(url_for('movie_details', title=movie['title']))
