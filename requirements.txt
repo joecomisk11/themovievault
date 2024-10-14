@@ -15,3 +15,5 @@ flask_login>=0.5.0
 flask_sqlalchemy>=3.0.0
 psycopg2-binary==2.9.3
 flask_migrate>=3.1.0
+sentry-sdk[flask]>=1.4.3
+sentry-sdk>=1.4.3
